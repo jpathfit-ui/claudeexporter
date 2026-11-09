@@ -1,14 +1,17 @@
 {
-  "name": "Claude Chat Exporter",
-  "short_name": "Chat Exporter",
+  "id": "./",
+  "name": "Claude Transfer",
+  "short_name": "Transfer",
+  "description": "Move your Claude chats and projects to a new account. Runs entirely in your browser.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#faf9f5",
   "theme_color": "#d4673f",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ]
 }

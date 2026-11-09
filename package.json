@@ -1,0 +1,6 @@
+{
+  "name": "claude-transfer",
+  "private": true,
+  "description": "Move Claude chats and projects to a new account. Runs in the browser.",
+  "scripts": { "test": "node tests/core.test.js" }
+}

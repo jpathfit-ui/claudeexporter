@@ -1,331 +1,86 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#d4673f">
-<meta name="apple-mobile-web-app-title" content="Chat Exporter">
-<meta name="description" content="Turn a Claude conversations export into per-project transcript files. Runs entirely in your browser.">
-<title>Claude Chat Exporter</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<style>
-:root{--bg:#faf9f5;--fg:#1f1e1d;--mut:#6b6a66;--card:#fff;--bd:#dedcd1;--ac:#c15f3c;--acfg:#fff;--b0:#f4eee2;--b1:#e6eee6;--bad:#b3261e;--ok:#1f8a4c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1f1e1d;--fg:#f0eee6;--mut:#a09f98;--card:#2b2a28;--bd:#47453f;--b0:#3a3630;--b1:#2f3a33;--bad:#ff8a80}}
-:root[data-theme="dark"]{--bg:#1f1e1d;--fg:#f0eee6;--mut:#a09f98;--card:#2b2a28;--bd:#47453f;--b0:#3a3630;--b1:#2f3a33;--bad:#ff8a80;--ok:#2fa862}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
-main{max-width:720px;margin:0 auto;padding:16px}
-h1{font-size:22px;margin:8px 0}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin:12px 0}
-.card h2{font-size:15px;margin:0 0 8px}
-p,label{font-size:14px;color:var(--mut)}
-textarea,input[type=text],input[type=password]{width:100%;box-sizing:border-box;background:var(--bg);color:var(--fg);border:1px solid var(--bd);border-radius:8px;padding:8px;font:14px/1.4 ui-monospace,monospace;margin:4px 0}
-textarea{min-height:150px}
-input[type=file]{max-width:100%;font-size:14px;color:var(--fg)}
-button{display:block;width:100%;box-sizing:border-box;min-height:48px;background:var(--ac);color:var(--acfg);border:0;border-radius:8px;padding:10px 14px;font-size:15px;margin-top:10px;overflow-wrap:anywhere;text-align:center}
-button:disabled{opacity:.4}
-.blk{background:var(--b0);border-radius:10px;margin:10px 0;overflow:hidden}
-.blk.alt{background:var(--b1)}
-.blk summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--ac);color:var(--acfg);padding:9px 12px;font-weight:600;font-size:15px}
-.blk summary::-webkit-details-marker{display:none}
-.blk summary .nm{overflow-wrap:anywhere;min-width:0}
-.blk summary small{font-weight:400;opacity:.9;display:block;font-size:12px}
-.blk summary .tg{flex:none;border:1px solid rgba(255,255,255,.75);border-radius:999px;padding:2px 11px;font-size:12px;font-weight:500;white-space:nowrap}
-.blk summary .tg::after{content:"Show \25BE"}
-.blk[open] summary .tg::after{content:"Hide \25B4"}
-.blk ul{margin:0;padding:8px 12px 10px 28px;font-size:14px;max-height:190px;overflow-y:auto;-webkit-overflow-scrolling:touch;border-top:1px solid var(--bd)}
-.blk ul.chk{padding-left:12px}
-.blk li{margin:3px 0;overflow-wrap:anywhere}
-.blk ul.chk li{list-style:none}
-.blk ul.chk label{display:flex;gap:8px;align-items:flex-start;color:var(--fg)}
-.blk ul.chk input{margin-top:4px;flex:none}
-.blk li.bad,.blk li.bad label{color:var(--bad);font-weight:600}
-.blk li.sum{list-style:none;margin-left:-16px;color:var(--mut)}
-.blk .bar{padding:8px 12px 0}
-.blk button{width:calc(100% - 24px);margin:8px 12px 12px}
-button.save{background:var(--ok);font-weight:600;box-shadow:0 2px 0 rgba(0,0,0,.18)}
-.blk .bar button.sm{width:auto;min-height:0;display:inline-block;margin:0 6px 0 0;padding:4px 12px;font-size:12px;background:transparent;color:var(--fg);border:1px solid var(--bd)}
-button.sm{width:auto;min-height:0;display:inline-block;margin:0 6px 6px 0;padding:4px 12px;font-size:12px;background:transparent;color:var(--fg);border:1px solid var(--bd)}
-#st{font-size:14px;color:var(--mut)}
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Transfer">
+<meta name="description" content="Move your Claude chats and projects to a new account. Turns a Claude data export into per-project files. Runs entirely in your browser.">
+<title>Claude Transfer</title>
+<link rel="stylesheet" href="style.css">
+</head><body><main>
+<h1>Claude Transfer<small>Move your chats and projects to a new Claude account.</small></h1>
+<p>Everything runs in your browser. Nothing is uploaded anywhere. An independent tool, not made by or affiliated with Anthropic.</p>
 
-#ldr{position:fixed;inset:0;z-index:9999;overflow:hidden;background:color-mix(in srgb,var(--bg) 72%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:opacity .45s ease}
-#ldr.out{opacity:0;pointer-events:none}
-#ldr i{position:absolute;bottom:-20px;border-radius:50%;background:var(--ac);opacity:0;will-change:transform,opacity;animation:ldrRise var(--d) ease-out var(--t) infinite}
-@keyframes ldrRise{0%{transform:translate3d(0,0,0) scale(1);opacity:0}15%{opacity:var(--o)}100%{transform:translate3d(var(--x),-85vh,0) scale(.2);opacity:0}}
-@media (prefers-reduced-motion:reduce){#ldr i{animation-duration:3s}}
-#ldr .ico{position:absolute;left:50%;top:50%;width:min(52vw,210px);height:min(52vw,210px);margin:calc(min(52vw,210px)/-2) 0 0 calc(min(52vw,210px)/-2);filter:drop-shadow(0 10px 22px rgba(120,45,20,.35))}
-#ldr .ico svg{width:100%;height:100%;display:block;overflow:visible}
-#ldr .arm{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(0);animation:ldrArm .5s cubic-bezier(.2,.9,.3,1.2) var(--a) forwards}
-@keyframes ldrArm{0%{transform:scaleY(0)}100%{transform:scaleY(1)}}
-#ldr .arw{animation:ldrArw 1s ease-in 1.45s forwards}
-@keyframes ldrArw{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-70px);opacity:0}}
-#ldr .ico{animation:ldrIco .45s ease-out both}
-@keyframes ldrIco{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
-#ldr b{position:absolute;border-radius:50%;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.9);opacity:0;animation:ldrPuff var(--d) ease-out var(--t) forwards}
-@keyframes ldrPuff{0%{transform:translate(0,0) scale(1);opacity:0}15%{opacity:.95}100%{transform:translate(var(--x),-150px) scale(.2);opacity:0}}
-@media (prefers-reduced-motion:reduce){#ldr .arm{animation-duration:1s}}
-</style></head><body><main>
-<h1>Claude Chat Exporter</h1>
-<p>Everything runs in your browser. Nothing is uploaded anywhere.</p>
-
-<div class="card"><h2>1. Conversations file</h2>
-<input type="file" id="f" accept=".json">
-<p id="fs">No file loaded.</p></div>
+<div class="card"><h2>1. Load your export</h2>
+<label class="fld" for="f">Conversations file (conversations.json)</label>
+<input type="file" id="f" accept=".json,.zip" multiple>
+<p id="fs">No file loaded.</p>
+<div id="big" class="warn" hidden></div>
+<label class="fld" for="pf">Projects file (projects.json, or the projects zip)</label>
+<input type="file" id="pf" accept=".json,.zip" multiple>
+<p id="pfs">Optional, but needed to bundle each project's instructions and documents.</p></div>
 
 <div class="card"><h2>2. Project lists</h2>
-<p>Paste your lists. Start each project with a # heading, then one chat title per line. Each project appears below as its own block. Load the file first and titles that are not found turn red.</p>
+<p>Claude's export doesn't say which chats belong to which project, so you give it that list. Ask your original Claude for it with the prompt below.</p>
+<label class="fld" for="psel">A. Get the list from your original account</label>
+<p class="hint">Open the project in your original Claude account, start a new chat inside it, paste this prompt, then copy the code block Claude replies with. Repeat for each project.</p>
+<select id="psel"><option value="">Any project (type its name below)</option></select>
+<textarea id="pr" class="prompt" spellcheck="false"></textarea>
+<div class="btns"><button id="cp" type="button">Copy prompt</button><button id="op" type="button" class="ghost" disabled>Open project in Claude</button></div>
+<p id="cps" class="hint"></p>
+
+<label class="fld" for="t">B. Paste the lists here</label>
+<p class="hint">Each project starts with a # heading, then one chat title per line. Paste several projects one after another. Titles that are not found turn red, with the closest match offered.</p>
 <textarea id="t" placeholder="# GOL Evaluation&#10;Evaluation meeting action items&#10;Toronto hospital research network&#10;&#10;# Meeting Log Tool&#10;Organizing meeting transcripts chronologically"></textarea>
-<div id="prev"></div></div>
+<div id="prev"></div>
+
+<div id="pbox" hidden>
+<label class="fld">Projects found in your export</label>
+<p id="pcount" class="hint"></p>
+<div id="plist" class="plist"></div>
+<div class="btns"><button id="padd" type="button" class="ghost">Add checked projects to my lists</button><button id="pblank" type="button" class="ghost"></button></div>
+</div></div>
 
 <div class="card"><h2>3. Options</h2>
-<label>Max size per part (characters): <input id="lim" type="text" inputmode="numeric" value="420000" style="width:120px"></label>
-<label style="display:block;margin-top:6px"><input type="checkbox" id="skip"> Skip chats already in my ledger</label>
-<p>Optional: load the ledger from your last export (the ledger.csv file). Loading it turns the checkbox on.</p>
-<input type="file" id="lf" accept=".csv">
+<label class="opt"><input type="checkbox" id="o_art" checked><span>Include artifacts<small>Documents, code and apps Claude created in a chat.</small></span></label>
+<label class="opt"><input type="checkbox" id="o_att" checked><span>Include attachment text<small>The text of files you uploaded to chats, not just their names.</small></span></label>
+<label class="opt"><input type="checkbox" id="o_tool"><span>Include tool calls and results<small>Searches and lookups Claude ran. Mostly noise, and it adds a lot of size.</small></span></label>
+<label class="opt"><input type="checkbox" id="o_think"><span>Include Claude's thinking<small>Very long, and rarely worth the space.</small></span></label>
+<label style="display:block;margin-top:8px">Max size per part (characters): <input id="lim" type="text" inputmode="numeric" value="420000" style="width:120px"></label>
+<label class="opt"><input type="checkbox" id="skip"><span>Skip chats already in my ledger</span></label>
+<p>Optional: load the ledger from your last export (ledger.json, or an older ledger.csv). Loading it turns the checkbox on.</p>
+<input type="file" id="lf" accept=".json,.csv">
+<p id="lfs"></p>
 <button id="go" disabled>Build transcripts</button></div>
 
+<div class="card"><h2>Results</h2><div id="st">Waiting.</div><div id="out"></div>
+<div id="sa" hidden>
+<div class="btns"><button id="sab" type="button" class="save">Save all as one zip</button><button id="shb" type="button" class="ghost" hidden>Share all…</button></div>
+<p class="hint">On iPhone, tap the saved zip in Files to unzip it into a folder with the same name. Each project gets its own folder inside, holding its instructions, documents and transcripts.</p>
+</div></div>
+
+<div class="card"><h2>Ledger</h2>
+<p id="ls">Nothing recorded yet. Chats are added to the ledger when you save their files.</p>
+<button id="sv" type="button" class="ghost" disabled>Save ledger.json</button>
+<p class="hint">Keep this file. Load it next time to skip chats you already have.</p></div>
+
 <div class="card"><h2>Google Sheet sync (optional)</h2>
-<p>Only the ledger syncs: project, chat title, chat ID, dates and file name. No message text is ever sent.</p>
-<input type="text" id="su" placeholder="Apps Script web app URL">
-<input type="password" id="sk" placeholder="Secret key">
+<p>Only the ledger syncs: project, chat title, chat ID, dates and file name. No message text is ever sent. The URL and key are kept on this device only.</p>
+<input type="text" id="su" placeholder="Apps Script web app URL (https://script.google.com/…)" autocomplete="off">
+<input type="password" id="sk" placeholder="Secret key" autocomplete="off">
 <button id="sl">Load ledger from Sheet</button>
-<button id="ss" disabled>Send new rows to Sheet</button>
+<button id="ss" disabled>Send saved rows to Sheet</button>
+<button id="sc" type="button" class="ghost">Forget saved Sheet details</button>
 <p id="sst"></p></div>
 
-<div class="card"><h2>Results</h2><div id="st">Waiting.</div><div id="out"></div></div>
-
 <div id="ldr" aria-hidden="true"><div class="ico"></div></div>
-<script>
-(function(){
-  var o=document.getElementById('ldr');if(!o)return;
-  for(var n=0;n<34;n++){
-    var b=document.createElement('i'),z=4+Math.random()*8;
-    b.style.cssText='left:'+(Math.random()*100)+'%;width:'+z+'px;height:'+z+'px;'+
-      '--d:'+(1.6+Math.random()*1.4).toFixed(2)+'s;--t:'+(-Math.random()*2.5).toFixed(2)+'s;'+
-      '--x:'+((Math.random()-.5)*60).toFixed(0)+'px;--o:'+(.35+Math.random()*.55).toFixed(2);
-    o.appendChild(b);
-  }
-  // Icon: stacked 3D burst with the upward arrow. Arms extend clockwise.
-  var ang=[-6,24,56,88,120,152,188,224,256,288,322,356],len=[190,140.6,174.8,129.2,182.4,136.8,171,125.4,190,136.8,176.7,148.2];
-  var layers=[[376,'#b5654a'],[364,'#c98b72'],[358,'#d9a58c'],[354,'#e6b9a5'],[352,'#ebc1ad'],[350,'#fff7f1']];
-  function arm(a,l,i){return '<g transform="rotate('+a+')"><path class="arm" style="--a:'+(0.35+i*0.11).toFixed(2)+'s" d="M-24.7,0 L-13.3,-'+l+' A13.3,13.3 0 0 1 13.3,-'+l+' L24.7,0 Z"/></g>'}
-  var star='';
-  layers.forEach(function(L){
-    star+='<g transform="translate(256,'+L[0]+') scale(1,.46)" fill="'+L[1]+'">'+ang.map(function(a,i){return arm(a,len[i],i)}).join('')+'<circle r="36.1"/></g>';
-  });
-  var svg='<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs>'+
-    '<linearGradient id="ldBg" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#e8906f"/><stop offset=".55" stop-color="#d97757"/><stop offset="1" stop-color="#bd5d3f"/></linearGradient>'+
-    '<linearGradient id="ldSh" gradientUnits="userSpaceOnUse" x1="0" y1="350" x2="0" y2="136"><stop offset="0" stop-color="#d9a58c"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#fff"/></linearGradient>'+
-    '<clipPath id="ldTile"><rect width="512" height="512" rx="112"/></clipPath></defs>'+
-    '<g clip-path="url(#ldTile)"><rect width="512" height="512" fill="url(#ldBg)"/>'+
-    '<ellipse cx="256" cy="384" rx="190" ry="44" fill="#4a170a" opacity=".4"/>'+star+
-    '<ellipse cx="256" cy="350" rx="36" ry="15" fill="#7a2f18"/><ellipse cx="256" cy="350" rx="36" ry="15" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="3"/>'+
-    '<g class="arw"><path d="M252,360 L260,360 L269,136 L243,136 Z" fill="url(#ldSh)"/><circle cx="256" cy="122" r="13" fill="#fff"/>'+
-    '<path d="M-13,0 L-2.5,-84 A2.5,2.5 0 0 1 2.5,-84 L13,0 Z" transform="translate(256,122) rotate(225)" fill="#fff"/>'+
-    '<path d="M-13,0 L-2.5,-84 A2.5,2.5 0 0 1 2.5,-84 L13,0 Z" transform="translate(256,122) rotate(135)" fill="#fff"/></g></g>'+
-    '<rect x="3" y="3" width="506" height="506" rx="109" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3"/></svg>';
-  var ico=o.firstChild;ico.innerHTML=svg;
-  // Particles lift off the arrow as it dissolves
-  for(var k=0;k<16;k++){
-    var q=document.createElement('b'),w=3+Math.random()*5;
-    q.style.cssText='left:'+(44+Math.random()*12)+'%;top:'+(18+Math.random()*10)+'%;width:'+w+'px;height:'+w+'px;'+
-      '--d:'+(0.9+Math.random()*0.7).toFixed(2)+'s;--t:'+(1.4+Math.random()*0.9).toFixed(2)+'s;--x:'+((Math.random()-.5)*50).toFixed(0)+'px';
-    ico.appendChild(q);
-  }
-  var gone=false;
-  function done(){if(gone)return;gone=true;o.classList.add('out');setTimeout(function(){o.remove()},500)}
-  o.addEventListener('pointerdown',done);
-  setTimeout(done,3000);
-})();
-</script>
-<script>
-var convs=null,led={},pending=[],projects=[],off={},opn={};
-var $=function(i){return document.getElementById(i)};
-function norm(s){return (s||'').toLowerCase().replace(/…/g,'').replace(/[^a-z0-9 ]/g,'').trim()}
-function safe(s){return s.replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,'')}
-function tick(){return new Promise(function(r){setTimeout(r,30)})}
-function find(t){
-  if(!convs)return[];var nt=norm(t);
-  var ex=convs.filter(function(c){return norm(c.name)===nt});
-  if(!ex.length&&t.slice(-1)==='…')ex=convs.filter(function(c){return norm(c.name).indexOf(nt)===0});
-  return ex;
-}
-function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e}
-
-$('f').onchange=async function(e){
-  var f=e.target.files[0];if(!f)return;
-  $('fs').textContent='Reading '+(f.size/1048576).toFixed(0)+' MB...';
-  try{convs=JSON.parse(await f.text());$('fs').textContent=convs.length+' chats loaded.';$('go').disabled=false;preview()}
-  catch(x){$('fs').textContent='Could not read file: '+x.message}
-};
-$('lf').onchange=async function(e){
-  var f=e.target.files[0];if(!f)return;
-  var rows=(await f.text()).split('\n').slice(1);led={};
-  rows.forEach(function(r){var m=r.match(/"([^"]*)","[^"]*","([^"]*)","([^"]*)"/);if(m)led[m[2]+'|'+m[3]]=1});
-  $('skip').checked=true;
-};
-
-function parse(txt){
-  var L=txt.split('\n'),map={},order=[],cur=null;
-  for(var i=0;i<L.length;i++){
-    var l=L[i].trim();if(!l)continue;
-    var nextBlank=i+1<L.length&&L[i+1].trim()==='';
-    var hasMore=L.slice(i+1).some(function(x){return x.trim()});
-    var head=l[0]==='#'||(nextBlank&&hasMore&&(!convs||!find(l.replace(/^([-*•]|\d+[.)])\s*/,'')).length));
-    if(head){
-      var name=l.replace(/^#+\s*/,'');
-      if(!map[name]){map[name]={name:name,titles:[],seen:{}};order.push(name)}
-      cur=map[name];
-    }else{
-      if(!cur){cur={name:'Project',titles:[],seen:{}};map.Project=cur;order.push('Project')}
-      var t=l.replace(/^([-*•]|\d+[.)])\s*/,'');
-      if(!cur.seen[norm(t)]){cur.seen[norm(t)]=1;cur.titles.push(t)}
-    }
-  }
-  return order.map(function(n){return map[n]});
-}
-function sel_(p){return p.titles.filter(function(t){return !off[p.name+'|'+norm(t)]&&(!convs||find(t).length)})}
-function headTxt(p){
-  var m=convs?p.titles.filter(function(t){return !find(t).length}).length:0;
-  return sel_(p).length+' of '+p.titles.length+' selected'+(convs&&m?', '+m+' not found':'');
-}
-function mkSummary(name,sub){
-  var sm=el('summary'),w=el('div','nm',name),sb=el('small','',sub);
-  w.appendChild(sb);sm.appendChild(w);sm.appendChild(el('span','tg'));
-  return {sm:sm,sub:sb};
-}
-function preview(){
-  projects=parse($('t').value);
-  var box=$('prev');box.innerHTML='';
-  if(projects.length){
-    var ea=el('button','sm','Expand all'),ca=el('button','sm','Collapse all');
-    ea.onclick=function(){box.querySelectorAll('details').forEach(function(d){d.open=true})};
-    ca.onclick=function(){box.querySelectorAll('details').forEach(function(d){d.open=false})};
-    box.appendChild(ea);box.appendChild(ca);
-  }
-  projects.forEach(function(p,i){
-    var d=el('details','blk'+(i%2?' alt':''));d.open=!!opn[p.name];
-    d.ontoggle=function(){opn[p.name]=d.open};
-    var h=mkSummary(p.name,headTxt(p));d.appendChild(h.sm);
-    var bar=el('div','bar'),ul=el('ul','chk');
-    var all=el('button','sm','Select all'),none=el('button','sm','None');
-    function setAll(v){p.titles.forEach(function(t){off[p.name+'|'+norm(t)]=!v});ul.querySelectorAll('input:not(:disabled)').forEach(function(c){c.checked=v});h.sub.textContent=headTxt(p)}
-    all.onclick=function(){setAll(true)};none.onclick=function(){setAll(false)};
-    bar.appendChild(all);bar.appendChild(none);d.appendChild(bar);
-    p.titles.forEach(function(t){
-      var bad=convs&&!find(t).length,li=el('li',bad?'bad':''),lb=el('label'),cb=document.createElement('input');
-      cb.type='checkbox';cb.checked=!off[p.name+'|'+norm(t)]&&!bad;cb.disabled=!!bad;
-      cb.onchange=function(){off[p.name+'|'+norm(t)]=!cb.checked;h.sub.textContent=headTxt(p)};
-      lb.appendChild(cb);lb.appendChild(el('span','',(bad?'Not found: ':'')+t));li.appendChild(lb);ul.appendChild(li);
-    });
-    d.appendChild(ul);box.appendChild(d);
-  });
-}
-$('t').oninput=preview;
-
-function body(m){
-  var t=m.text||'';
-  if(!t.trim())t=(m.content||[]).filter(function(b){return b&&b.type==='text'}).map(function(b){return b.text||''}).join('\n');
-  return t;
-}
-function msg(m){
-  var a=[].concat(m.attachments||[],m.files||[]).map(function(x){return x.file_name}).filter(Boolean);
-  return '\n## '+(m.sender==='human'?'USER':'CLAUDE')+' ('+(m.created_at||'').slice(0,16).replace('T',' ')+')\n\n'+(a.length?'[Attachments: '+a.join(', ')+']\n':'')+body(m)+'\n';
-}
-function saveBtn(parent,label,name,gen){
-  var b=el('button','save','Save '+label);
-  b.onclick=function(){gen().then(function(bl){var a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download=name;a.click()})};
-  parent.appendChild(b);
-}
-
-$('go').onclick=async function(){
-  projects=parse($('t').value);
-  var out=$('out');out.innerHTML='';pending=[];$('ss').disabled=true;
-  if(!projects.length){$('st').textContent='Paste at least one project list.';return}
-  $('go').disabled=true;
-  var LIM=parseInt($('lim').value)||420000,ledger=['project,title,uuid,updated_at,file'];
-  for(var pi=0;pi<projects.length;pi++){
-    var p=projects[pi];
-    $('st').textContent='Working on project '+(pi+1)+' of '+projects.length+': '+p.name+'...';
-    await tick();
-    var blk=el('details','blk'+(pi%2?' alt':''));
-    var hh=mkSummary(p.name,'Working...');blk.appendChild(hh.sm);
-    var ul=el('ul');
-    var sel={};
-    sel_(p).forEach(function(t){
-      var ex=find(t);
-      if(!ex.length)ul.appendChild(el('li','bad','Not found: '+t));
-      if(ex.length>1)ul.appendChild(el('li','','Shared title ('+ex.length+' chats, all included): '+t));
-      ex.forEach(function(c){sel[c.uuid]=c});
-    });
-    var list=Object.keys(sel).map(function(k){return sel[k]}).sort(function(a,b){return a.created_at<b.created_at?-1:1});
-    if($('skip').checked){var n0=list.length;list=list.filter(function(c){return !led[c.uuid+'|'+c.updated_at]});ul.appendChild(el('li','','Skipped '+(n0-list.length)+' already exported'))}
-    if(!list.length){hh.sub.textContent='Nothing to export';ul.appendChild(el('li','sum','Nothing to export'));blk.appendChild(ul);out.appendChild(blk);continue}
-    var parts=[[]],owner=[[]],size=0;
-    list.forEach(function(c){
-      var hdr='\n\n---\n\n# CHAT: '+c.name+'\nCreated: '+c.created_at+' | Updated: '+c.updated_at+' | Messages: '+c.chat_messages.length+'\n';
-      var ms=c.chat_messages.map(msg),total=hdr.length+ms.reduce(function(s,x){return s+x.length},0);
-      function put(txt){parts[parts.length-1].push(txt);owner[owner.length-1].push(c)}
-      if(size+total<=LIM){put(hdr+ms.join(''));size+=total}
-      else if(total<=LIM){parts.push([]);owner.push([]);put(hdr+ms.join(''));size=total}
-      else{
-        if(size>0){parts.push([]);owner.push([])}
-        var cur=hdr;
-        ms.forEach(function(s){
-          if(cur.length+s.length>LIM){put(cur+'\n\n[chat continues in the next part]\n');parts.push([]);owner.push([]);cur='\n\n---\n\n# CHAT (continued): '+c.name+'\n'}
-          cur+=s;
-        });
-        put(cur);size=cur.length;
-      }
-    });
-    var N=parts.length,base=safe(p.name),pz=new JSZip(),files=[];
-    parts.forEach(function(pt,i){
-      var fn=base+(N>1?'_Part'+String(i+1).padStart(2,'0'):'_Full_Chats')+'.md';
-      var txt='# '+p.name+': full chat transcripts'+(N>1?' (part '+(i+1)+' of '+N+')':'')+'\n'+pt.join('');
-      files.push({fn:fn,txt:txt});pz.file(fn,txt);
-      var seenU={};owner[i].forEach(function(c){if(seenU[c.uuid])return;seenU[c.uuid]=1;
-        ledger.push('"'+p.name+'","'+c.name.replace(/"/g,"'")+'","'+c.uuid+'","'+c.updated_at+'","'+fn+'"');
-        pending.push({project:p.name,title:c.name,uuid:c.uuid,updated_at:c.updated_at,file:fn})});
-      ul.appendChild(el('li','',fn+'  (~'+Math.round(txt.length/4000)+'K tokens)'));
-    });
-    ul.appendChild(el('li','sum',list.length+' chats, '+N+' part'+(N>1?'s':'')));hh.sub.textContent=list.length+' chats, '+N+' file'+(N>1?'s':'')+' (zip)';if(N===1)hh.sub.textContent=list.length+' chats, 1 file';
-    blk.appendChild(ul);
-    if(N===1)saveBtn(blk,files[0].fn,files[0].fn,function(){return Promise.resolve(new Blob([files[0].txt],{type:'text/markdown'}))});
-    else saveBtn(blk,base+'_Transcripts.zip',base+'_Transcripts.zip',function(){return pz.generateAsync({type:'blob'})});
-    out.appendChild(blk);
-    blk.scrollIntoView({block:'nearest'});
-    await tick();
-  }
-  var lb=el('details','blk'+(projects.length%2?' alt':''));
-  lb.appendChild(mkSummary('Ledger','Keep for next time').sm);
-  var lu=el('ul');lu.appendChild(el('li','sum','Keep this file. Load it next time to skip chats already exported.'));lb.appendChild(lu);
-  saveBtn(lb,'ledger.csv','ledger.csv',function(){return Promise.resolve(new Blob([ledger.join('\n')],{type:'text/csv'}))});
-  out.appendChild(lb);
-  $('st').textContent='Done. '+projects.length+' project'+(projects.length>1?'s':'')+' processed.';
-  $('ss').disabled=!pending.length;$('go').disabled=false;
-};
-
-try{$('su').value=localStorage.getItem('ce_url')||'';$('sk').value=localStorage.getItem('ce_key')||''}catch(x){}
-function creds(){var u=$('su').value.trim(),k=$('sk').value.trim();try{localStorage.setItem('ce_url',u);localStorage.setItem('ce_key',k)}catch(x){}return{u:u,k:k}}
-$('sl').onclick=async function(){
-  var c=creds();if(!c.u||!c.k){$('sst').textContent='Enter the URL and key first.';return}
-  $('sst').textContent='Loading...';
-  try{
-    var r=await fetch(c.u+(c.u.indexOf('?')<0?'?':'&')+'key='+encodeURIComponent(c.k));
-    var d=await r.json();if(d.error){$('sst').textContent='Sheet said: '+d.error;return}
-    led={};d.rows.forEach(function(x){led[x.uuid+'|'+x.updated_at]=1});
-    $('skip').checked=true;$('sst').textContent='Loaded '+d.rows.length+' ledger rows from the Sheet.';
-  }catch(x){$('sst').textContent='Could not reach the Sheet: '+x.message}
-};
-$('ss').onclick=async function(){
-  var c=creds();if(!c.u||!c.k||!pending.length)return;
-  $('sst').textContent='Sending '+pending.length+' rows...';
-  try{
-    var r=await fetch(c.u,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({key:c.k,rows:pending})});
-    var d=await r.json();
-    if(d.error){$('sst').textContent='Sheet said: '+d.error}else{$('sst').textContent='Added '+d.added+' rows to the Sheet.';$('ss').disabled=true}
-  }catch(x){$('sst').textContent='Send failed: '+x.message+'. Check the Sheet before retrying, in case rows were added.'}
-};
-</script></main></body></html>
+<script src="splash.js"></script>
+<script src="jszip.min.js" integrity="sha384-DdGlNq+wVXAn83gXqwyeFHB7iyXy6L0rLrNzgDmhKWPjiJLg9vj6qosYmZmkMfQ+"></script>
+<script src="core.js"></script>
+<script src="app.js"></script>
+</main></body></html>
