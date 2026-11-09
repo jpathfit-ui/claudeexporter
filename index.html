@@ -49,6 +49,12 @@ button.save{background:var(--ok);font-weight:600;box-shadow:0 2px 0 rgba(0,0,0,.
 .blk .bar button.sm{width:auto;min-height:0;display:inline-block;margin:0 6px 0 0;padding:4px 12px;font-size:12px;background:transparent;color:var(--fg);border:1px solid var(--bd)}
 button.sm{width:auto;min-height:0;display:inline-block;margin:0 6px 6px 0;padding:4px 12px;font-size:12px;background:transparent;color:var(--fg);border:1px solid var(--bd)}
 #st{font-size:14px;color:var(--mut)}
+
+#ldr{position:fixed;inset:0;z-index:9999;overflow:hidden;background:color-mix(in srgb,var(--bg) 72%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:opacity .45s ease}
+#ldr.out{opacity:0;pointer-events:none}
+#ldr i{position:absolute;bottom:-20px;border-radius:50%;background:var(--ac);opacity:0;will-change:transform,opacity;animation:ldrRise var(--d) ease-out var(--t) infinite}
+@keyframes ldrRise{0%{transform:translate3d(0,0,0) scale(1);opacity:0}15%{opacity:var(--o)}100%{transform:translate3d(var(--x),-85vh,0) scale(.2);opacity:0}}
+@media (prefers-reduced-motion:reduce){#ldr i{animation-duration:3s}}
 </style></head><body><main>
 <h1>Claude Chat Exporter</h1>
 <p>Everything runs in your browser. Nothing is uploaded anywhere.</p>
@@ -79,6 +85,23 @@ button.sm{width:auto;min-height:0;display:inline-block;margin:0 6px 6px 0;paddin
 
 <div class="card"><h2>Results</h2><div id="st">Waiting.</div><div id="out"></div></div>
 
+<div id="ldr" aria-hidden="true"></div>
+<script>
+(function(){
+  var o=document.getElementById('ldr');if(!o)return;
+  for(var n=0;n<34;n++){
+    var b=document.createElement('i'),z=4+Math.random()*8;
+    b.style.cssText='left:'+(Math.random()*100)+'%;width:'+z+'px;height:'+z+'px;'+
+      '--d:'+(1.6+Math.random()*1.4).toFixed(2)+'s;--t:'+(-Math.random()*2.5).toFixed(2)+'s;'+
+      '--x:'+((Math.random()-.5)*60).toFixed(0)+'px;--o:'+(.35+Math.random()*.55).toFixed(2);
+    o.appendChild(b);
+  }
+  var gone=false;
+  function done(){if(gone)return;gone=true;o.classList.add('out');setTimeout(function(){o.remove()},500)}
+  o.addEventListener('pointerdown',done);
+  setTimeout(done,2400);
+})();
+</script>
 <script>
 var convs=null,led={},pending=[],projects=[],off={},opn={};
 var $=function(i){return document.getElementById(i)};
