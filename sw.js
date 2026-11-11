@@ -1,6 +1,6 @@
 /* Claude Transfer service worker: keeps the app files on the device so it opens offline.
    Bump CACHE when you publish a new version. */
-const CACHE = 'claude-transfer-v1';
+const CACHE = 'claude-transfer-v2';
 const ASSETS = [
   './', 'index.html', 'style.css', 'splash.js', 'core.js', 'app.js', 'jszip.min.js',
   'manifest.webmanifest', 'favicon.svg', 'favicon-32.png', 'apple-touch-icon.png',

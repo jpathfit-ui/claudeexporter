@@ -9,7 +9,7 @@
 
   var idx = null, convs = null;      // chat index and chat list
   var projects = [], showBlank = false, pchk = {};
-  var pmap = {}, off = {}, opn = {}; // heading -> export project, unticked chats, open blocks
+  var pmap = {}, off = {}, opn = {}, fexc = {}, popen = {}; // heading -> export project, unticked chats, open blocks
   var ledRows = [], led = {};        // ledger loaded from a file or the Sheet
   var saved = [], sent = {};         // rows saved this session, rows already sent to the Sheet
   var built = [];                    // results of the last build
@@ -71,7 +71,7 @@
     try {
       projects = CT.normalizeProjects(await readValues(files));
       if (!projects.length) { $('pfs').textContent = 'No projects found in that file. Pick projects.json (or the projects zip) from your export.'; return; }
-      pmap = {}; pchk = {};
+      pmap = {}; pchk = {}; fexc = {}; popen = {};
       var hidden = projects.filter(CT.isBlankProject).length;
       $('pfs').textContent = (projects.length - hidden) + ' projects loaded' + (hidden ? ' (' + hidden + ' empty placeholder' + (hidden > 1 ? 's' : '') + ' hidden)' : '') + '.';
       fillProjectSelect(); preview();
@@ -133,7 +133,16 @@
     }
     $('t').value = lines.join('\n'); preview();
   }
-  function exportProject(p) { var v = pmap[p.name]; return v ? projects[+v] : null; }
+  // The project bundled for a heading, minus any files unticked in the "Projects found" list.
+  function exportProject(p) {
+    var v = pmap[p.name]; if (!v) return null;
+    var src = projects[+v], c = {};
+    for (var k in src) c[k] = src[k];
+    if (fexc[v + '|i']) c.instructions = '';
+    if (fexc[v + '|d']) c.description = '';
+    c.docs = src.docs.map(function (d, i) { return fexc[v + '|' + i] ? { filename: '', content: '' } : d; });
+    return c;
+  }
   function includes(pr) {
     var f = CT.projectFiles(pr), docs = f.filter(function (x) { return /^knowledge\//.test(x.path); }).length, bits = [];
     if (f.some(function (x) { return x.path === 'instructions.md'; })) bits.push('instructions');
@@ -210,17 +219,46 @@
     var vis = visibleProjects(), hidden = projects.length - projects.filter(function (p) { return !CT.isBlankProject(p); }).length;
     var listed = {};
     lastLists.forEach(function (l) { var v = pmap[l.name]; if (v) listed[v] = 1; });
-    $('pcount').textContent = vis.length + ' project' + (vis.length === 1 ? '' : 's') + ' shown. Check any you want to add to your lists, for example projects with documents but no chats.';
-    var pl = $('plist'); pl.innerHTML = '';
+    $('pcount').textContent = vis.length + ' project' + (vis.length === 1 ? '' : 's') + ' shown. Tick a project to add it to your lists. Tap Files to see exactly what comes over and untick any you don\u2019t want.';
+    var pl = $('plist'), keep = pl.scrollTop; pl.innerHTML = '';
     vis.forEach(function (p) {
-      var key = String(projects.indexOf(p)), lb = el('label'), cb = document.createElement('input');
-      cb.type = 'checkbox'; cb.checked = !!pchk[key]; cb.disabled = !!listed[key];
-      cb.onchange = function () { pchk[key] = cb.checked; };
+      var key = String(projects.indexOf(p)), row = el('div', 'prow'), top = el('div', 'ptop');
+      var items = [];
+      if (String(p.instructions).trim()) items.push({ k: 'i', name: 'instructions.md', len: String(p.instructions).length });
+      if (String(p.description).trim()) items.push({ k: 'd', name: 'description.md', len: String(p.description).length });
+      p.docs.forEach(function (d, i) { if (d.filename || String(d.content).trim()) items.push({ k: String(i), name: d.filename || 'document-' + (i + 1), len: String(d.content).length }); });
+      var nOn = items.filter(function (it) { return !fexc[key + '|' + it.k]; }).length;
+      var lb = el('label');
+      if (listed[key]) { lb.appendChild(el('span', 'tick', '\u2713')); }
+      else { var cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!pchk[key]; cb.onchange = function () { pchk[key] = cb.checked; }; lb.appendChild(cb); }
       var sp = el('span'); sp.appendChild(document.createTextNode(pname(p)));
-      var docs = p.docs.filter(function (d) { return d.filename || String(d.content).trim(); }).length;
-      sp.appendChild(el('small', '', (listed[key] ? 'In your lists. ' : '') + docs + ' document' + (docs === 1 ? '' : 's') + (String(p.instructions).trim() ? ', has instructions' : '')));
-      lb.appendChild(cb); lb.appendChild(sp); pl.appendChild(lb);
+      sp.appendChild(el('small', '', (listed[key] ? 'In your lists. ' : '') + (items.length ? nOn + ' of ' + items.length + ' files will come over' : 'No files')));
+      lb.appendChild(sp); top.appendChild(lb);
+      if (items.length) {
+        var fb = el('button', 'sm', popen[key] ? 'Hide files' : 'Files');
+        fb.type = 'button'; fb.onclick = function () { popen[key] = !popen[key]; renderProjects(); };
+        top.appendChild(fb);
+      }
+      row.appendChild(top);
+      if (popen[key] && items.length) {
+        var fl = el('div', 'pfiles'), bar = el('div', 'pbar');
+        function setAll(v) { items.forEach(function (it) { fexc[key + '|' + it.k] = !v; }); pl.dataset.keep = pl.scrollTop; preview(); }
+        var ba = el('button', 'sm', 'Select all'), bn = el('button', 'sm', 'Select none');
+        ba.type = bn.type = 'button'; ba.onclick = function () { setAll(true); }; bn.onclick = function () { setAll(false); };
+        bar.appendChild(ba); bar.appendChild(bn); fl.appendChild(bar);
+        items.forEach(function (it) {
+          var l2 = el('label'), c2 = document.createElement('input');
+          c2.type = 'checkbox'; c2.checked = !fexc[key + '|' + it.k];
+          c2.onchange = function () { fexc[key + '|' + it.k] = !c2.checked; pl.dataset.keep = pl.scrollTop; preview(); };
+          var s2 = el('span'); s2.appendChild(document.createTextNode(it.name));
+          s2.appendChild(el('small', '', it.len > 1000 ? Math.round(it.len / 1000) + 'K characters' : it.len + ' characters'));
+          l2.appendChild(c2); l2.appendChild(s2); fl.appendChild(l2);
+        });
+        row.appendChild(fl);
+      }
+      pl.appendChild(row);
     });
+    pl.scrollTop = pl.dataset.keep ? +pl.dataset.keep : keep; pl.dataset.keep = '';
     var pb = $('pblank'); pb.hidden = !hidden; pb.textContent = (showBlank ? 'Hide ' : 'Show ') + hidden + ' empty placeholder' + (hidden > 1 ? 's' : '');
   }
   $('pblank').onclick = function () { showBlank = !showBlank; fillProjectSelect(); preview(); };
